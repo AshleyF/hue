@@ -1,7 +1,4 @@
 #!/bin/bash
 
-fsharpc \
-  ./program.fs \
-  -r:System.dll
-
+fsharpc ./program.fs
 mono ./program.exe
