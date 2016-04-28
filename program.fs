@@ -65,15 +65,44 @@ let saturate num hue =
         for s in 0 .. 255 do set s
         for s in 255 .. -1 .. 0 do set s
 
-printfn """\nDemos
+let control num =
+    let rec control' h s b on =
+        let h = max 0 (min 65535 h)
+        let s = max 0 (min 255 s)
+        let b = max 0 (min 255 b)
+        printfn "Control: on=%b hue=%i sat=%i bright=%i" on h s b
+        setLight host id num on b s h
+        match Console.Read() |> char with
+        | 'h' -> control' (h - 500) s b on
+        | 'H' -> control' (h + 500) s b on
+        | 's' -> control' h (s - 5) b on
+        | 'S' -> control' h (s + 5) b on
+        | 'b' -> control' h s (b - 5) on
+        | 'B' -> control' h s (b + 5) on
+        | 'o' -> control' h s b (not on)
+        | 'q' -> ()
+        | k -> printfn "Unknown key: %c" k
+               control' h s b on
+    control' 0 255 255 true
+
+printfn "\n\n"
+printfn """Demos
 0 Random
 1 Pulse
 2 Rainbow
-3 Saturate"""
+3 Saturate
+4 White
+5 Tracey's Favorite
+9 Control"""
 let light = 3
 match Console.Read() |> char with
 | '0' -> random light
 | '1' -> pulse light 0
 | '2' -> rainbow light
 | '3' -> saturate light 0
+| '4' -> setLight host id light true 255 0 0
+| '5' -> setLight host id light true 255 255 6000
+| '9' -> control light
 | _   -> printfn "No demo"
+
+printfn "\nDone"
